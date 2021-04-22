@@ -1,0 +1,12 @@
+contracts:
+  rewards:
+    abi: ../build/rewards/rewards.abi
+    name: rewards
+    wasm: ../build/rewards/rewards.wasm
+  token:
+    abi: ../build/eosio.token/eosio.token.abi
+    name: token
+    wasm: ../build/eosio.token/eosio.token.wasm
+options:
+  serverBaseUrl: 'http://127.0.0.1:8889'
+  skipAuth: false

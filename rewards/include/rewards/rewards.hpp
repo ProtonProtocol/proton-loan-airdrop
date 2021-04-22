@@ -60,7 +60,7 @@ public:
   ACTION close(const name& user, const vector<symbol_code>& stakes);
 
   ACTION initrewards(const extended_symbol& reward_symbol);
-  ACTION setrewards(const symbol_code& stake,
+  ACTION createstake(const extended_symbol& stake_symbol,
                     const asset& rewards_per_half_second);
 
   // Initialize tables from tables.hpp

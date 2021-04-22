@@ -1,6 +1,103 @@
 #include <rewards/rewards.hpp>
 
+/** Mechanics
+
+Main idea:
+The rewards for a user in a single market depend on their proportional share of
+the total staked assets. Therefore, we keep track of events that change the
+total staked amount. These are the "deposit" and "withdraw" actions. In-between
+two such events, the reward payout is linear:
+1. Total reward payout: timeDeltaInHalfSeconds * rewardPerHalfBlock
+2. For this time period, the user stakes did not change and can be credited
+accordingly
+So whenever any such event happens, we first pay out the rewards using the old
+stake state, and then update the stake state.
+
+the total user rewards are the sum of their rewards in each period:
+total_user_rewards = sum_{p in periods}: user_stake_p / total_staked_p *
+rewards_p
+however, this is hard to track because we'd need to update all users on each
+period.
+
+a lot of times the user_stake_p does not change for a specific user as other
+people are depositing/withdrawing. we can further split this into period
+_sequences_ where the user_stake_p is constant:
+total_user_rewards_u = sum_{cp in constant_periods_u}
+  sum_{p in cp}: user_stake_cp / total_staked_p * rewards_p
+  = sum_{cp in constant_periods} user_stake_cp * [sum_{p in cp}: rewards_p /
+total_staked_p]
+
+notice that if we introduce a new variable "reward_index_p" and define it as:
+reward_index_p = sum_{i=0..p}: rewards_i / total_staked_i
+we get for the inner sum:
+sum_{p in cp}: rewards_p / total_staked_p = reward_index_{cp.end} -
+reward_index_{cp.begin}
+
+Therefore:
+total_user_rewards = sum_{cp in constant_periods} user_stake_cp *
+(reward_index_{cp.end} - reward_index_{cp.begin})
+
+What does this formula mean?
+It means that we only need to keep track of a running reward_index variable on
+each deposit/withdraw, and we only need to update a user when their balance
+changes, i.e., when the user themself runs deposit/withdraw.
+So we can keep track of all users, by only updating the running index and the
+currently depositing/withdrawing user.
+
+A note on the initial value of reward_index:
+Notice how the first period starts from initializing the rewards (`createstake`
+acttion) until the first deposit. As the user's balance is zero, it doesn't
+matter what the initial value of reward_index_0 is as it gets multipled by 0.
+We choose the initial reward_index value to be 0 for convenience reasons.
+ */
+
 namespace proton {
+void rewards::initrewards(const extended_symbol& reward_symbol) {
+  require_auth(get_self());
+  auto globals_it = _globalscfg.begin();
+
+  auto upsert = [&](auto& g) {
+    // changing the reward symbol would break the current outstanding claims
+    check(g.reward_symbol.get_contract().value == 0,
+          "reward symbol has already been set");
+    g.reward_symbol = reward_symbol;
+  };
+  if (globals_it == _globalscfg.end()) {
+    _globalscfg.emplace(get_self(), upsert);
+  } else {
+    _globalscfg.modify(globals_it, get_self(), upsert);
+  }
+}
+
+void rewards::createstake(const extended_symbol& stake_symbol,
+                          const asset& rewards_per_half_second) {
+  require_auth(get_self());
+
+  auto globals = get_globals();
+  check(globals.reward_symbol.get_contract().value != 0,
+        "set up reward token with initrewards first");
+  check(globals.reward_symbol.get_symbol() == rewards_per_half_second.symbol,
+        "reward symbol mismatch");
+
+  // check if stake already exists
+  auto cfg_it = _rewardscfg.find(stake_symbol.get_symbol().code().raw());
+  if (cfg_it == _rewardscfg.end()) {
+    _rewardscfg.emplace(get_self(), [&](auto& r) {
+      r.total_staked = extended_asset(0, stake_symbol);
+      r.rewards_per_half_second = rewards_per_half_second.amount;
+      r.reward_index = 0.0;
+      r.reward_time = current_time_point();
+    });
+  } else {
+    // update index up to now using the old reward rate
+    update_reward_index(cfg_it->get_extended_symbol().get_symbol().code());
+
+    _rewardscfg.modify(cfg_it, same_payer, [&](auto& r) {
+      r.rewards_per_half_second = rewards_per_half_second.amount;
+    });
+  }
+}
+
 void rewards::deposit_stake(const name& depositor,
                             const extended_asset& token) {
   require_auth(depositor);
@@ -9,13 +106,18 @@ void rewards::deposit_stake(const name& depositor,
   check_user_in_stake(depositor, token.get_extended_symbol());
 
   // update rewards for stake token
-  update_reward_index(token.quantity.symbol.code());
-  update_user_rewards(depositor, token.quantity.symbol.code());
+  symbol_code stake_sym = token.quantity.symbol.code();
+  update_reward_index(stake_sym);
+  update_user_rewards(depositor, stake_sym);
 
   auto rewards_it =
       _rewards.require_find(depositor.value, "enter markets first");
   _rewards.modify(rewards_it, same_payer,
                   [&](auto& r) { r.append_tokens({token}); });
+
+  auto rewardscfg_it = get_reward_config_by_stake(stake_sym);
+  _rewardscfg.modify(rewardscfg_it, same_payer,
+                     [&](auto& r) { r.total_staked += token; });
 }
 
 void rewards::withdraw(const name& withdrawer, const extended_asset& token) {
@@ -108,68 +210,6 @@ void rewards::close(const name& user, const vector<symbol_code>& stakes) {
   }
 }
 
-void rewards::update(const vector<symbol_code>& stake_symbols) {
-  // no auth required
-  // manually trigger an update
-  // useful for "read actions" to call in the same transaction
-  for (const auto& stake_sym : stake_symbols) {
-    update_reward_index(stake_sym);
-  }
-}
-
-void rewards::update_user(const name& user) {
-  // no auth required
-  // manually trigger an update
-  // useful for "read actions" to call in the same transaction
-  auto rewards_it = _rewards.require_find(user.value, "enter markets first");
-  vector<symbol_code> user_stakes;
-  for (const auto& pair : rewards_it->stakes) {
-    user_stakes.push_back(pair.first.get_symbol().code());
-  }
-
-  for (const symbol_code& stake_sym : user_stakes) {
-    update_reward_index(stake_sym);
-    update_user_rewards(user, stake_sym);
-  }
-}
-
-void rewards::initrewards(const extended_symbol& reward_symbol) {
-  require_auth(get_self());
-  auto globals_it = _globalscfg.begin();
-
-  auto upsert = [&](auto& g) {
-    // changing the reward symbol would break the current outstanding claims
-    check(g.reward_symbol.get_contract().value == 0,
-          "reward symbol has already been set");
-    g.reward_symbol = reward_symbol;
-  };
-  if (globals_it == _globalscfg.end()) {
-    _globalscfg.emplace(get_self(), upsert);
-  } else {
-    _globalscfg.modify(globals_it, get_self(), upsert);
-  }
-}
-
-void rewards::setrewards(const symbol_code& stake,
-                         const asset& rewards_per_half_second) {
-  require_auth(get_self());
-
-  auto globals = get_globals();
-  check(globals.reward_symbol.get_contract().value != 0,
-        "set up reward token with initrewards first");
-  check(globals.reward_symbol.get_symbol() == rewards_per_half_second.symbol,
-        "reward symbol mismatch");
-
-  // rewards config always exists upon stake creation
-  // update all indexes up to now using the old reward rate
-  update_reward_index(stake);
-
-  auto rewards_it = get_reward_config_by_stake(stake);
-  _rewardscfg.modify(rewards_it, same_payer, [&](auto& r) {
-    r.rewards_per_half_second = rewards_per_half_second.amount;
-  });
-}
-
 void rewards::claim(const name& claimer, const vector<symbol_code>& stakes) {
   check(has_auth(get_self()) || has_auth(claimer), "missing authorization");
 
@@ -225,6 +265,31 @@ int64_t rewards::_claim(const name& claimer,
   }
 
   return (initial_reward_balance - running_reward_balance).quantity.amount;
+}
+
+void rewards::update(const vector<symbol_code>& stake_symbols) {
+  // no auth required
+  // manually trigger an update
+  // useful for "read actions" to call in the same transaction
+  for (const auto& stake_sym : stake_symbols) {
+    update_reward_index(stake_sym);
+  }
+}
+
+void rewards::update_user(const name& user) {
+  // no auth required
+  // manually trigger an update
+  // useful for "read actions" to call in the same transaction
+  auto rewards_it = _rewards.require_find(user.value, "enter markets first");
+  vector<symbol_code> user_stakes;
+  for (const auto& pair : rewards_it->stakes) {
+    user_stakes.push_back(pair.first.get_symbol().code());
+  }
+
+  for (const symbol_code& stake_sym : user_stakes) {
+    update_reward_index(stake_sym);
+    update_user_rewards(user, stake_sym);
+  }
 }
 
 void rewards::update_reward_index(const symbol_code& stake) {
