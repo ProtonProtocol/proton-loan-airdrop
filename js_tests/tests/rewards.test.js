@@ -1,11 +1,6 @@
 // @ts-check
 const { loadConfig, Blockchain } = require("@klevoya/hydra");
-const {
-  setOraclePrices,
-  asset2dec,
-  compound,
-  getRateForAPY,
-} = require("./helpers");
+const { safeParseInt } = require("./helpers");
 
 const config = loadConfig("hydra.yml");
 
@@ -36,6 +31,21 @@ describe("rewards", () => {
       from: token.accountName,
       to: rewards.accountName,
       quantity: `10000000000.0000 REWARDS`,
+      memo: `deposit rewards`,
+    });
+    await token.contract.create({
+      issuer: token.accountName,
+      maximum_supply: "10000000000.0000 LOAN",
+    });
+    await token.contract.issue({
+      to: token.accountName,
+      quantity: "10000000000.0000 LOAN",
+      memo: "",
+    });
+    await token.contract.transfer({
+      from: token.accountName,
+      to: rewards.accountName,
+      quantity: `10000000000.0000 LOAN`,
       memo: `deposit rewards`,
     });
 
@@ -85,19 +95,29 @@ describe("rewards", () => {
 
     // reset rewards
     rewards.resetTables(`rewards`, `rewards.cfg`);
-    await rewards.contract.createstake({
+    await rewards.contract.setrewards({
       stake_symbol: {
         sym: `8,BTCUSDC`,
         contract: lpToken.accountName,
       },
-      rewards_per_half_second: `0.1000 REWARDS`,
+      rewards_per_half_second: [
+        {
+          quantity: `0.1000 REWARDS`,
+          contract: token.accountName,
+        },
+      ],
     });
-    await rewards.contract.createstake({
+    await rewards.contract.setrewards({
       stake_symbol: {
         sym: `7,DOGEUSD`,
         contract: lpToken.accountName,
       },
-      rewards_per_half_second: `1.0000 REWARDS`,
+      rewards_per_half_second: [
+        {
+          quantity: `0.1000 REWARDS`,
+          contract: token.accountName,
+        },
+      ],
     });
     await rewards.contract.open(
       {
@@ -137,16 +157,6 @@ describe("rewards", () => {
     );
   });
 
-  it("sets up globals (rewards)", async () => {
-    // set reward symbol
-    await rewards.contract.initrewards({
-      reward_symbol: {
-        sym: `4,REWARDS`,
-        contract: token.accountName,
-      },
-    });
-  });
-
   test("pays out single staker rewards correctly", async () => {
     await resetRewards();
     // end is in 1 year
@@ -172,13 +182,6 @@ describe("rewards", () => {
       [{ actor: user1.accountName, permission: `active` }]
     );
 
-    // await rewards.contract.claim(
-    //   {
-    //     user: user1.accountName,
-    //   },
-    //   [{ actor: user1.accountName, permission: `active` }]
-    // );
-
     const [user1Rewards] = rewards.getTableRowsScoped(`rewards`)[
       rewards.accountName
     ];
@@ -189,33 +192,48 @@ describe("rewards", () => {
 
     // allow little bit of rounding errors
     expect(
-      Number.parseInt(user1Rewards.stakes[0].value.accrued_rewards) -
+      safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
         expectedUser1Rewards
     ).toBeLessThan(1);
     expect(user1Rewards.stakes[0].value).toMatchObject({
       balance: "100000000",
-      reward_index: 630.72,
+      reward_indices: [630.72],
     });
 
     const rewardsCfg = rewards.getTableRowsScoped(`rewards.cfg`)[
       rewards.accountName
     ];
     expect(rewardsCfg[0]).toMatchObject({
-      reward_index: 630.72,
+      reward_indices: [630.72],
       reward_time: "2002-01-01T00:00:00.000",
-      rewards_per_half_second: "1000",
+      rewards_per_half_second: [
+        {
+          contract: "token",
+          quantity: "0.1000 REWARDS",
+        },
+      ],
       total_staked: {
         contract: "proton.swaps",
         quantity: "1.00000000 BTCUSDC",
       },
     });
+
+    await rewards.contract.claim(
+      {
+        claimer: user1.accountName,
+        stakes: [`BTCUSDC`]
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
   });
 }); // end describe
 
 /**
  * To test:
+ * [ ] cannot withdraw more LP tokens than deposited
  * [ ] no double claim
  * [ ] can claim several stakes correctly
  * [ ] two users share the rewards
  * [ ] if nobody staked, no rewards are paid, but time is updated
+ * [ ] implement book-keeping of contract reward balances as staking token could be used as reward token for some other stake
  */

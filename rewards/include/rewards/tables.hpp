@@ -8,8 +8,7 @@ using namespace std;
 
 namespace proton {
 struct [[eosio::table, eosio::contract("rewards")]] globals_config {
-  /// the extended symbol of the token rewards are paid in
-  extended_symbol reward_symbol;
+  /// not needed for now, don't instantiate it
 
   // there shall only be 1 global
   uint64_t primary_key() const { return 0; };
@@ -19,10 +18,11 @@ typedef multi_index<"globals.cfg"_n, globals_config> globals_config_table;
 struct [[eosio::table, eosio::contract("rewards")]] rewards_config {
   /// references stake symbol to accrue rewards for & total stake amount
   extended_asset total_staked;
-  /// amount of reward tokens to distribute to the depositors per block
-  int64_t rewards_per_half_second;
+  /// reward tokens to distribute to the depositors per block
+  vector<extended_asset> rewards_per_half_second;
   /// index result of the last rewards allocation
-  double reward_index;
+  /// same order as rewards_per_half_second
+  vector<double> reward_indices;
   /// last time at which rewards were allocated
   time_point reward_time;
 
@@ -33,6 +33,24 @@ struct [[eosio::table, eosio::contract("rewards")]] rewards_config {
   extended_symbol get_extended_symbol() const {
     return total_staked.get_extended_symbol();
   };
+
+  /// appends new rewards tokens or updates existing ones with new amount
+  void update_rewards(vector<extended_asset> new_rewards) {
+    // not efficient, but as the vectors usually have 1-2 elements that's fine
+    for (const extended_asset& reward : new_rewards) {
+      auto found_it = std::find_if(
+          rewards_per_half_second.begin(), rewards_per_half_second.end(),
+          [&reward](const extended_asset& x) {
+            return x.get_extended_symbol() == reward.get_extended_symbol();
+          });
+      if (found_it == rewards_per_half_second.end()) {
+        rewards_per_half_second.push_back(reward);
+        reward_indices.push_back(0.0);
+      } else {
+        *found_it = reward;
+      }
+    };
+  };
 };
 typedef multi_index<"rewards.cfg"_n, rewards_config> rewards_config_table;
 
@@ -41,9 +59,11 @@ struct reward_snapshot {
   /// deposited stake balance
   int64_t balance;
   /// rewards accrued (in reward token) but not claimed yet
-  int64_t accrued_rewards;
-  /// last index of when rewards were updated
-  double reward_index;
+  /// same order as in rewards_config
+  vector<int64_t> accrued_rewards;
+  /// latest indices of when rewards were updated
+  /// same order as in rewards_config
+  vector<double> reward_indices;
 };
 struct [[eosio::table, eosio::contract("rewards")]] reward {
   /// user account for this reward position

@@ -59,9 +59,10 @@ public:
   // closes balances for user in these stakes
   ACTION close(const name& user, const vector<symbol_code>& stakes);
 
-  ACTION initrewards(const extended_symbol& reward_symbol);
-  ACTION createstake(const extended_symbol& stake_symbol,
-                    const asset& rewards_per_half_second);
+  /// updates or appends new reward token emissions for the stake symbol
+  /// existing reward tokens cannot be removed and must be set to 0 amount instead
+  ACTION setrewards(const extended_symbol& stake_symbol,
+                       const vector<extended_asset>& rewards_per_half_second);
 
   // Initialize tables from tables.hpp
   globals_config_table _globalscfg;
@@ -69,14 +70,14 @@ public:
   rewards_table _rewards;
 
 private:
-  int64_t _claim(const name& claimer, const vector<symbol_code>& stakes);
+  bool _claim(const name& claimer, const vector<symbol_code>& stakes);
   rewards_config_table::const_iterator get_reward_config_by_stake(
       const symbol_code& stake_symbol);
   globals_config get_globals();
   void check_user_in_stake(const name& user,
                            const extended_symbol& stake_symbol);
 
-  void update_reward_index(const symbol_code& stake);
+  void update_reward_indices(const symbol_code& stake);
   void update_user_rewards(const name& user, const symbol_code& stake);
 };
 
