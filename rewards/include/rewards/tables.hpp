@@ -37,17 +37,17 @@ struct [[eosio::table, eosio::contract("rewards")]] rewards_config {
   /// appends new rewards tokens or updates existing ones with new amount
   void update_rewards(vector<extended_asset> new_rewards) {
     // not efficient, but as the vectors usually have 1-2 elements that's fine
-    for (const extended_asset& reward : new_rewards) {
+    for (const extended_asset& new_reward : new_rewards) {
       auto found_it = std::find_if(
           rewards_per_half_second.begin(), rewards_per_half_second.end(),
-          [&reward](const extended_asset& x) {
-            return x.get_extended_symbol() == reward.get_extended_symbol();
+          [&new_reward](const extended_asset& x) {
+            return x.get_extended_symbol() == new_reward.get_extended_symbol();
           });
       if (found_it == rewards_per_half_second.end()) {
-        rewards_per_half_second.push_back(reward);
+        rewards_per_half_second.push_back(new_reward);
         reward_indices.push_back(0.0);
       } else {
-        *found_it = reward;
+        *found_it = new_reward;
       }
     };
   };
@@ -89,8 +89,8 @@ struct [[eosio::table, eosio::contract("rewards")]] reward {
       const auto balance_amount = stakes[ext_symbol].balance;
       check(balance_amount >= subtract_token.quantity.amount,
             "Balance overdrawn. Need " + subtract_token.quantity.to_string() +
-                " but balance is " + to_string(balance_amount) +
-                " for symbol " + ext_symbol.get_symbol().code().to_string() +
+                " but balance is " +
+                asset(balance_amount, ext_symbol.get_symbol()).to_string() +
                 " contract " + ext_symbol.get_contract().to_string());
       stakes[ext_symbol].balance -= subtract_token.quantity.amount;
     }

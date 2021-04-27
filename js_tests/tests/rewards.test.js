@@ -114,7 +114,7 @@ describe("rewards", () => {
       },
       rewards_per_half_second: [
         {
-          quantity: `0.1000 REWARDS`,
+          quantity: `0.0500 REWARDS`,
           contract: token.accountName,
         },
       ],
@@ -157,7 +157,61 @@ describe("rewards", () => {
     );
   });
 
-  test("pays out single staker rewards correctly", async () => {
+  test("cannot withdraw more LP tokens than deposited", async () => {
+    await resetRewards();
+    // end is in 1 year
+    const end = new Date(`2002-01-01T00:00:00.000Z`);
+
+    await lpToken.contract.transfer(
+      {
+        from: user1.accountName,
+        to: rewards.accountName,
+        quantity: `1.00000000 BTCUSDC`,
+        memo: ``,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+    await lpToken.contract.transfer(
+      {
+        from: user1.accountName,
+        to: rewards.accountName,
+        quantity: `1.0000000 DOGEUSD`,
+        memo: ``,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    // advance time to end
+    blockchain.setCurrentTime(end);
+
+    await rewards.contract.withdraw(
+      {
+        withdrawer: user1.accountName,
+        token: {
+          contract: lpToken.accountName,
+          quantity: "1.00000000 BTCUSDC",
+        },
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    const [user1Rewards] = rewards.getTableRowsScoped(`rewards`)[
+      rewards.accountName
+    ];
+
+    // withdraw should have paid rewards
+    const claimedBalances = token.getTableRowsScoped(`accounts`)[
+      user1.accountName
+    ];
+    expect(claimedBalances[0]).toMatchObject({
+      balance: `6307200.0000 REWARDS`,
+    });
+    // and transferred out LP tokens again
+    const balances = lpToken.getTableRowsScoped(`accounts`)[user1.accountName];
+    expect(balances[0].balance).toEqual(`1000.00000000 BTCUSDC`);
+  });
+
+  test("pays out single staker rewards correctly, cannot claim twice", async () => {
     await resetRewards();
     // end is in 1 year
     const end = new Date(`2002-01-01T00:00:00.000Z`);
@@ -213,7 +267,7 @@ describe("rewards", () => {
         },
       ],
       total_staked: {
-        contract: "proton.swaps",
+        contract: lpToken.accountName,
         quantity: "1.00000000 BTCUSDC",
       },
     });
@@ -221,19 +275,297 @@ describe("rewards", () => {
     await rewards.contract.claim(
       {
         claimer: user1.accountName,
-        stakes: [`BTCUSDC`]
+        stakes: [`BTCUSDC`],
       },
       [{ actor: user1.accountName, permission: `active` }]
     );
+
+    await expect(
+      rewards.contract.claim(
+        {
+          claimer: user1.accountName,
+          stakes: [`BTCUSDC`],
+        },
+        [{ actor: user1.accountName, permission: `active` }]
+      )
+    ).rejects.toHaveProperty(
+      "message",
+      expect.stringMatching(/nothing to claim/gi)
+    );
+    const claimedBalances = token.getTableRowsScoped(`accounts`)[
+      user1.accountName
+    ];
+    expect(claimedBalances[0]).toMatchObject({
+      balance: `6307200.0000 REWARDS`,
+    });
+  });
+
+  test("pays out multiple staker rewards correctly", async () => {
+    await resetRewards();
+    await rewards.contract.setrewards({
+      stake_symbol: {
+        sym: `8,BTCUSDC`,
+        contract: lpToken.accountName,
+      },
+      rewards_per_half_second: [
+        {
+          quantity: `0.1000 REWARDS`,
+          contract: token.accountName,
+        },
+        {
+          quantity: `0.0500 LOAN`,
+          contract: token.accountName,
+        },
+      ],
+    });
+    // need to enter market again because rewards was changed
+    await rewards.contract.open(
+      {
+        payer: rewards.accountName,
+        user: user1.accountName,
+        stakes: [`BTCUSDC`],
+      },
+      [{ actor: rewards.accountName, permission: `active` }]
+    );
+
+    // end is in 1 year
+    const end = new Date(`2002-01-01T00:00:00.000Z`);
+
+    await lpToken.contract.transfer(
+      {
+        from: user1.accountName,
+        to: rewards.accountName,
+        quantity: `1.00000000 BTCUSDC`,
+        memo: ``,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    // advance time to end
+    blockchain.setCurrentTime(end);
+
+    await rewards.contract[`update.user`](
+      {
+        user: user1.accountName,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    const [user1Rewards] = rewards.getTableRowsScoped(`rewards`)[
+      rewards.accountName
+    ];
+    const blocksDelta = Math.floor((end.getTime() - start.getTime()) / 500);
+    const rewardsPerBlock = 1000;
+    const totalAmount = rewardsPerBlock * blocksDelta;
+    const expectedUser1Rewards = totalAmount;
+    const expectedUser1Loan = totalAmount / 2;
+
+    // allow little bit of rounding errors
+    const btcStake = user1Rewards.stakes[0];
+    expect(
+      safeParseInt(btcStake.value.accrued_rewards[0]) - expectedUser1Rewards
+    ).toBeLessThan(1);
+    expect(user1Rewards.stakes[0].value).toMatchObject({
+      balance: "100000000",
+      reward_indices: [630.72, 315.36],
+    });
+    expect(
+      safeParseInt(btcStake.value.accrued_rewards[1]) - expectedUser1Loan
+    ).toBeLessThan(1);
+
+    await rewards.contract.claim(
+      {
+        claimer: user1.accountName,
+        stakes: [`BTCUSDC`],
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+    const claimedBalances = token.getTableRowsScoped(`accounts`)[
+      user1.accountName
+    ];
+    expect(claimedBalances).toEqual([
+      {
+        balance: `3153600.0000 LOAN`,
+      },
+      {
+        balance: `6307200.0000 REWARDS`,
+      },
+    ]);
+  });
+
+  test("pays out correctly according to time and balances deposited", async () => {
+    await resetRewards();
+
+    // end is in 1 year
+    const end = new Date(`2002-01-01T00:00:00.000Z`);
+
+    await lpToken.contract.transfer(
+      {
+        from: user1.accountName,
+        to: rewards.accountName,
+        quantity: `1.00000000 BTCUSDC`,
+        memo: ``,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    // advance time by 1/10
+    let now = new Date(
+      start.getTime() + (end.getTime() - start.getTime()) / 10
+    );
+    blockchain.setCurrentTime(now);
+    // user 2 starts minting 10x more
+    await lpToken.contract.transfer(
+      {
+        from: user2.accountName,
+        to: rewards.accountName,
+        quantity: `10.00000000 BTCUSDC`,
+        memo: ``,
+      },
+      [{ actor: user2.accountName, permission: `active` }]
+    );
+
+    // advance time to end
+    blockchain.setCurrentTime(end);
+
+    await rewards.contract[`update.user`]({
+      user: user1.accountName,
+    });
+    await rewards.contract[`update.user`]({
+      user: user2.accountName,
+    });
+
+    const [user1Rewards, user2Rewards] = rewards.getTableRowsScoped(`rewards`)[
+      rewards.accountName
+    ];
+    const blocksDelta = Math.floor((end.getTime() - start.getTime()) / 500);
+    const rewardsPerBlock = 1000;
+    const totalAmount = rewardsPerBlock * blocksDelta;
+    // received full amount on first 1/10 time, received 1/11 amount on 9/10 time
+    const expectedUser1Rewards = Math.floor(
+      (0.1 * 1 + 0.9 * (1 / 11)) * totalAmount
+    );
+
+    const expectedUser2Rewards = totalAmount - expectedUser1Rewards;
+
+    // allow little bit of rounding errors
+    expect(
+      safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
+        expectedUser1Rewards
+    ).toBeLessThan(1);
+    expect(
+      safeParseInt(user2Rewards.stakes[0].value.accrued_rewards[0]) -
+        expectedUser2Rewards
+    ).toBeLessThan(1);
+  });
+
+  test("rewards are independent of LP precision", async () => {
+    await resetRewards();
+
+    // end is in 1 year
+    const end = new Date(`2002-01-01T00:00:00.000Z`);
+
+    await lpToken.contract.transfer(
+      {
+        from: user1.accountName,
+        to: rewards.accountName,
+        quantity: `1.0000000 DOGEUSD`,
+        memo: ``,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    // advance time by 1/10
+    let now = new Date(
+      start.getTime() + (end.getTime() - start.getTime()) / 10
+    );
+    blockchain.setCurrentTime(now);
+    // user 2 starts minting 10x more
+    await lpToken.contract.transfer(
+      {
+        from: user2.accountName,
+        to: rewards.accountName,
+        quantity: `10.0000000 DOGEUSD`,
+        memo: ``,
+      },
+      [{ actor: user2.accountName, permission: `active` }]
+    );
+
+    // advance time to end
+    blockchain.setCurrentTime(end);
+
+    await rewards.contract[`update.user`]({
+      user: user1.accountName,
+    });
+    await rewards.contract[`update.user`]({
+      user: user2.accountName,
+    });
+
+    const [user1Rewards, user2Rewards] = rewards.getTableRowsScoped(`rewards`)[
+      rewards.accountName
+    ];
+    const blocksDelta = Math.floor((end.getTime() - start.getTime()) / 500);
+    const rewardsPerBlock = 1000;
+    const totalAmount = rewardsPerBlock * blocksDelta;
+    // received full amount on first 1/10 time, received 1/11 amount on 9/10 time
+    const expectedUser1Rewards = Math.floor(
+      (0.1 * 1 + 0.9 * (1 / 11)) * totalAmount
+    );
+
+    const expectedUser2Rewards = totalAmount - expectedUser1Rewards;
+
+    // allow little bit of rounding errors
+    expect(
+      safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
+        expectedUser1Rewards
+    ).toBeLessThan(1);
+    expect(
+      safeParseInt(user2Rewards.stakes[0].value.accrued_rewards[0]) -
+        expectedUser2Rewards
+    ).toBeLessThan(1);
+  });
+
+  test("no deposits no rewards", async () => {
+    await resetRewards();
+
+    // end is in 1 year
+    const end = new Date(`2002-01-01T00:00:00.000Z`);
+
+    // advance time to end
+    blockchain.setCurrentTime(end);
+
+    await rewards.contract[`update`]({
+      stake_symbols: [`BTCUSDC`],
+    });
+    const rewardsCfg = rewards.getTableRowsScoped(`rewards.cfg`)[
+      rewards.accountName
+    ];
+    expect(rewardsCfg[0]).toMatchObject({
+      // still 0
+      reward_indices: [0],
+      // but time is updated
+      reward_time: "2002-01-01T00:00:00.000",
+      rewards_per_half_second: [
+        {
+          contract: "token",
+          quantity: "0.1000 REWARDS",
+        },
+      ],
+      total_staked: {
+        contract: lpToken.accountName,
+        quantity: "0.00000000 BTCUSDC",
+      },
+    });
   });
 }); // end describe
 
 /**
  * To test:
- * [ ] cannot withdraw more LP tokens than deposited
- * [ ] no double claim
- * [ ] can claim several stakes correctly
- * [ ] two users share the rewards
- * [ ] if nobody staked, no rewards are paid, but time is updated
+ * [x] cannot withdraw more LP tokens than deposited
+ * [x] no double claim
+ * [x] can claim several stakes correctly
+ * [x] two users share the rewards
+ * [x] rewards with DOGE (7 decimals) work the same
+ * [x] if nobody staked, no rewards are paid, but time is updated
  * [ ] implement book-keeping of contract reward balances as staking token could be used as reward token for some other stake
  */

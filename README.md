@@ -22,8 +22,8 @@
 npm i -g @klevoya/hydra
 # run tests
 cd js_tests
-# run liquidation tests
-npm test -- liquidation
+# run tests
+npm test -- rewards
 ```
 
 # Documentation
