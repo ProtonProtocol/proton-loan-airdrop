@@ -246,9 +246,11 @@ describe("rewards", () => {
 
     // allow little bit of rounding errors
     expect(
-      safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
-        expectedUser1Rewards
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
+          expectedUser1Rewards
+      )
+    ).toBeLessThan(2);
     expect(user1Rewards.stakes[0].value).toMatchObject({
       balance: "100000000",
       reward_indices: [630.72],
@@ -363,15 +365,19 @@ describe("rewards", () => {
     // allow little bit of rounding errors
     const btcStake = user1Rewards.stakes[0];
     expect(
-      safeParseInt(btcStake.value.accrued_rewards[0]) - expectedUser1Rewards
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(btcStake.value.accrued_rewards[0]) - expectedUser1Rewards
+      )
+    ).toBeLessThan(2);
     expect(user1Rewards.stakes[0].value).toMatchObject({
       balance: "100000000",
       reward_indices: [630.72, 315.36],
     });
     expect(
-      safeParseInt(btcStake.value.accrued_rewards[1]) - expectedUser1Loan
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(btcStake.value.accrued_rewards[1]) - expectedUser1Loan
+      )
+    ).toBeLessThan(2);
 
     await rewards.contract.claim(
       {
@@ -450,13 +456,17 @@ describe("rewards", () => {
 
     // allow little bit of rounding errors
     expect(
-      safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
-        expectedUser1Rewards
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
+          expectedUser1Rewards
+      )
+    ).toBeLessThan(2);
     expect(
-      safeParseInt(user2Rewards.stakes[0].value.accrued_rewards[0]) -
-        expectedUser2Rewards
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(user2Rewards.stakes[0].value.accrued_rewards[0]) -
+          expectedUser2Rewards
+      )
+    ).toBeLessThan(2);
   });
 
   test("rewards are independent of LP precision", async () => {
@@ -505,7 +515,7 @@ describe("rewards", () => {
       rewards.accountName
     ];
     const blocksDelta = Math.floor((end.getTime() - start.getTime()) / 500);
-    const rewardsPerBlock = 1000;
+    const rewardsPerBlock = 500;
     const totalAmount = rewardsPerBlock * blocksDelta;
     // received full amount on first 1/10 time, received 1/11 amount on 9/10 time
     const expectedUser1Rewards = Math.floor(
@@ -516,13 +526,17 @@ describe("rewards", () => {
 
     // allow little bit of rounding errors
     expect(
-      safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
-        expectedUser1Rewards
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(user1Rewards.stakes[1].value.accrued_rewards[0]) -
+          expectedUser1Rewards
+      )
+    ).toBeLessThan(2);
     expect(
-      safeParseInt(user2Rewards.stakes[0].value.accrued_rewards[0]) -
-        expectedUser2Rewards
-    ).toBeLessThan(1);
+      Math.abs(
+        safeParseInt(user2Rewards.stakes[1].value.accrued_rewards[0]) -
+          expectedUser2Rewards
+      )
+    ).toBeLessThan(2);
   });
 
   test("no deposits no rewards", async () => {
@@ -557,6 +571,110 @@ describe("rewards", () => {
       },
     });
   });
+
+  test("rewards are correctly distributed after one user withdraws", async () => {
+    await resetRewards();
+
+    // end is in 1 year
+    const end = new Date(`2002-01-01T00:00:00.000Z`);
+
+    await lpToken.contract.transfer(
+      {
+        from: user1.accountName,
+        to: rewards.accountName,
+        quantity: `10.00000000 BTCUSDC`,
+        memo: ``,
+      },
+      [{ actor: user1.accountName, permission: `active` }]
+    );
+
+    // user 2 mints the same
+    await lpToken.contract.transfer(
+      {
+        from: user2.accountName,
+        to: rewards.accountName,
+        quantity: `10.00000000 BTCUSDC`,
+        memo: ``,
+      },
+      [{ actor: user2.accountName, permission: `active` }]
+    );
+
+    // advance time by 1/10
+    let now = new Date(
+      start.getTime() + (end.getTime() - start.getTime()) / 10
+    );
+    blockchain.setCurrentTime(now);
+
+    await rewards.contract[`update.user`]({
+      user: user2.accountName,
+    });
+    const [, user2RewardsOld] = rewards.getTableRowsScoped(`rewards`)[
+      rewards.accountName
+    ];
+    // user withdraws after 1/10 time
+    await rewards.contract.withdraw(
+      {
+        withdrawer: user2.accountName,
+        token: {
+          contract: lpToken.accountName,
+          quantity: "10.00000000 BTCUSDC",
+        },
+      },
+      [{ actor: user2.accountName, permission: `active` }]
+    );
+
+    // advance time to end
+    blockchain.setCurrentTime(end);
+
+    await rewards.contract[`update.user`]({
+      user: user1.accountName,
+    });
+    await rewards.contract[`update.user`]({
+      user: user2.accountName,
+    });
+
+    const [user1Rewards, user2Rewards] = rewards.getTableRowsScoped(`rewards`)[
+      rewards.accountName
+    ];
+    const blocksDelta = Math.floor((end.getTime() - start.getTime()) / 500);
+    const rewardsPerBlock = 1000;
+    const totalAmount = rewardsPerBlock * blocksDelta;
+    // received half amount on first 1/10 time, received full amount on 9/10 time
+    const expectedUser1Rewards = Math.floor(
+      (0.1 * 0.5 + 0.9 * 1.0) * totalAmount
+    );
+
+    const expectedUser2Rewards = totalAmount - expectedUser1Rewards;
+    // allow little bit of rounding errors
+    expect(
+      Math.abs(
+        safeParseInt(user1Rewards.stakes[0].value.accrued_rewards[0]) -
+          expectedUser1Rewards
+      )
+    ).toBeLessThan(2);
+    // user2 rewards have already been claimed at withdrawal
+    expect(
+      Math.abs(
+        safeParseInt(user2RewardsOld.stakes[0].value.accrued_rewards[0]) -
+          expectedUser2Rewards
+      )
+    ).toBeLessThan(2);
+    expect(
+      safeParseInt(user2Rewards.stakes[0].value.accrued_rewards[0])
+    ).toEqual(0);
+
+    // can close user2
+    await rewards.contract.close(
+      {
+        user: user2.accountName,
+        stakes: [`BTCUSDC`, `DOGEUSD`],
+      },
+      [{ actor: user2.accountName, permission: `active` }]
+    );
+    expect(
+      rewards.getTableRowsScoped(`rewards`)[rewards.accountName]
+    ).toHaveLength(1);
+  });
 }); // end describe
 
 /**
@@ -567,5 +685,7 @@ describe("rewards", () => {
  * [x] two users share the rewards
  * [x] rewards with DOGE (7 decimals) work the same
  * [x] if nobody staked, no rewards are paid, but time is updated
+ * [x] rewards are correctly distributed after one person withdraws
+ * [x] can close position
  * [ ] implement book-keeping of contract reward balances as staking token could be used as reward token for some other stake
  */

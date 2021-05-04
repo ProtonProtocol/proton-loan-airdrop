@@ -103,12 +103,21 @@ void rewards::withdraw(const name& withdrawer, const extended_asset& token) {
   // check if this market exists and if user entered
   check_user_in_stake(withdrawer, token.get_extended_symbol());
 
+  symbol_code stake_sym = token.quantity.symbol.code();
+  // updates and distributes rewards
   _claim(withdrawer, {token.quantity.symbol.code()});
 
   auto rewards_it =
       _rewards.require_find(withdrawer.value, "enter markets first");
   _rewards.modify(rewards_it, same_payer,
                   [&](auto& r) { r.subtract_tokens({token}); });
+
+  auto rewardscfg_it = get_reward_config_by_stake(stake_sym);
+  _rewardscfg.modify(rewardscfg_it, same_payer, [&](auto& r) {
+    r.total_staked -= token;
+    check(r.total_staked.quantity.amount >= 0,
+          "total staked cannot be less than 0");
+  });
 
   token::transfer_action transfer_act(token.contract,
                                       {get_self(), name("active")});
@@ -127,7 +136,7 @@ void rewards::withdraw_rewards(const name& to, const extended_asset& token) {
   // check that token is not a stake token
   check(_rewardscfg.find(token.quantity.symbol.code().raw()) ==
             _rewardscfg.end(),
-        "cannot withdraw a stake token");
+        "cannot withdraw stake tokens of users");
 
   token::transfer_action transfer_act(token.contract,
                                       {get_self(), name("active")});
@@ -183,7 +192,7 @@ void rewards::close(const name& user, const vector<symbol_code>& stakes) {
   // everywhere
   int64_t stake_count = 0;
 
-  auto rewards_it = _rewards.find(user.value);
+  auto rewards_it = _rewards.require_find(user.value, "nothing to close");
   _rewards.modify(rewards_it, same_payer, [&](auto& r) {
     r.account = user;
     for (const auto& stake_sym : stakes) {
@@ -193,11 +202,10 @@ void rewards::close(const name& user, const vector<symbol_code>& stakes) {
       if (stake_it != r.stakes.end()) {
         auto& accrued_rewards = stake_it->second.accrued_rewards;
         bool outstanding_claims =
-            std::count(stake_it->second.accrued_rewards.begin(),
-                       stake_it->second.accrued_rewards.end(),
-                       0) != stake_it->second.accrued_rewards.size();
+            std::count(accrued_rewards.begin(), accrued_rewards.end(), 0) !=
+            accrued_rewards.size();
         check(!outstanding_claims && stake_it->second.balance == 0,
-              "outstanding rewards or balance. must withdraw first");
+              "outstanding rewards or balance. must withdraw ad claim first");
         r.stakes.erase(stake_it);
       }
     }
@@ -230,14 +238,14 @@ bool rewards::_claim(const name& claimer, const vector<symbol_code>& stakes) {
     auto rewardscfg_it = get_reward_config_by_stake(stake_sym);
     extended_symbol stake_symbol = rewardscfg_it->get_extended_symbol();
     check_user_in_stake(claimer, stake_symbol);
-    auto rewards_it =
-        _rewards.require_find(claimer.value, "enter market first");
 
     // update user rewards first, can do this here because
     // we don't issue rewards but they are already in this contract
     update_reward_indices(stake_sym);
     update_user_rewards(claimer, stake_sym);
 
+    auto rewards_it =
+        _rewards.require_find(claimer.value, "enter market first");
     vector<int64_t> accrued_rewards =
         rewards_it->get_snapshot(stake_symbol).accrued_rewards;
 
@@ -256,13 +264,12 @@ bool rewards::_claim(const name& claimer, const vector<symbol_code>& stakes) {
       extended_asset& running_reward_balance =
           running_reward_balance_map[reward_symbol];
 
-      // there could be rounding errors such that the last claimer has a
-      // higher balance than what has been issued in the updates
+      // there could be the case where not enough rewards were deposited
       extended_asset to_transfer = running_reward_balance;
       if (accrued_reward < to_transfer.quantity.amount) {
         to_transfer.quantity.amount = accrued_reward;
       }
-      if (to_transfer.quantity.amount == 0)
+      if (to_transfer.quantity.amount <= 0)
         continue;
 
       has_claimed = true;

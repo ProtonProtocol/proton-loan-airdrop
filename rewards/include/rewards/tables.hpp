@@ -8,7 +8,7 @@ using namespace std;
 
 namespace proton {
 struct [[eosio::table, eosio::contract("rewards")]] globals_config {
-  /// not needed for now, don't instantiate it
+  /// not needed for now, don't emplace a row
 
   // there shall only be 1 global
   uint64_t primary_key() const { return 0; };
