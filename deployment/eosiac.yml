@@ -1,0 +1,119 @@
+---
+# include testnet private keys in this script as it's a private repo and testnet, that's fine
+# https://monitor.testnet.protonchain.com/#apiendpoints
+ptest:
+  chain_id: 71ee83bcf52142d61019d95f9cc5427ba6a0d7ff8accd9e2088ae2abeaf3d3dd
+  node_endpoint: https://testnet.protonchain.com:443
+  # node_endpoint: https://proton-testnet.eosphere.io:443
+  system_contract: eosio.token
+  system_symbol: 4,XPR
+  accounts_manager: cmichel
+  funds_manager: cmichel
+  ram_manager: cmichel
+
+
+  # cpu_payer:
+  #   account: cmichel
+  #   permission: payforcpu
+  #   key: 5...
+  #   action: cmichel@payforcpu
+
+  accounts:
+    cmichel:
+      signature:
+        type: key
+        private_keys:
+          - 5KcGKkiPW8YMB5sozCQRxcx4CPbx8xdzHARVUPpvkB8Ep3BWgZQ
+      auth:
+        owner:
+          permissions:
+            - EOS777kbKWvjeu6jJSo9YckD8PSRxkgSUubaoGZv6m43qAG7YUaqT
+        active:
+          parent: owner
+          permissions:
+            - EOS777kbKWvjeu6jJSo9YckD8PSRxkgSUubaoGZv6m43qAG7YUaqT
+
+    stakerewards:
+      signature:
+        type: key
+        private_keys:
+          - 5KBNvgcEqFw4rYxnSZq7ehtJNZrnVRMdaeqnbMP5KZ7SmiQabzm
+      auth:
+        owner:
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+        active:
+          parent: owner
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+            - stakerewards@eosio.code
+      code: ../build/rewards/rewards.wasm
+      abi: ../build/rewards/rewards.abi
+      ram: 700000
+      # tokens:
+      #   - account: eosio.token
+      #     amount: 0.0000 XPR
+
+    # stake token contract
+    protonswaps1:
+      signature:
+        type: key
+        private_keys:
+          - 5KBNvgcEqFw4rYxnSZq7ehtJNZrnVRMdaeqnbMP5KZ7SmiQabzm
+      auth:
+        owner:
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+        active:
+          parent: owner
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+            - protonswaps1@eosio.code
+      code: ../build/eosio.token/eosio.token.wasm
+      abi: ../build/eosio.token/eosio.token.abi
+      ram: 200000
+      tokens:
+        - account: eosio.token
+          amount: 0.0000 XPR
+
+    # reward token contract
+    stakerewtoks:
+      signature:
+        type: key
+        private_keys:
+          - 5KBNvgcEqFw4rYxnSZq7ehtJNZrnVRMdaeqnbMP5KZ7SmiQabzm
+      auth:
+        owner:
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+        active:
+          parent: owner
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+            - stakerewtoks@eosio.code
+      code: ../build/eosio.token/eosio.token.wasm
+      abi: ../build/eosio.token/eosio.token.abi
+      ram: 200000
+      tokens:
+        - account: eosio.token
+          amount: 0.0000 XPR
+
+    # reward token contract
+    useruseruser:
+      signature:
+        type: key
+        private_keys:
+          - 5KBNvgcEqFw4rYxnSZq7ehtJNZrnVRMdaeqnbMP5KZ7SmiQabzm
+      auth:
+        owner:
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+        active:
+          parent: owner
+          permissions:
+            - EOS8jEJRBAX6VqrKzCEyMmqqm34UNfXEZJjJ6W36bFSmuXUoAfrcg
+            - stakerewtoks@eosio.code
+      tokens:
+        - account: eosio.token
+          amount: 0.0000 XPR
+
