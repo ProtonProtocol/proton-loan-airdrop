@@ -54,7 +54,7 @@ public:
       const string& memo);
 
   // open balances for user in these stakes
-  ACTION open(const name& payer, const name& user,
+  ACTION open(const name& user,
               const vector<symbol_code>& stakes);
   // closes balances for user in these stakes
   ACTION close(const name& user, const vector<symbol_code>& stakes);

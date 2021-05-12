@@ -143,9 +143,9 @@ void rewards::withdraw_rewards(const name& to, const extended_asset& token) {
   transfer_act.send(get_self(), to, token.quantity, "withdraw rewards");
 }
 
-void rewards::open(const name& payer, const name& user,
+void rewards::open(const name& user,
                    const vector<symbol_code>& stakes) {
-  require_auth(payer);
+  require_auth(user);
   // open the reward balance for the user
   auto rewards_it = _rewards.find(user.value);
   auto upsert_rewards = [&](auto& r) {
@@ -179,10 +179,12 @@ void rewards::open(const name& payer, const name& user,
       }
     }
   };
+
+  // it was decided that we'll pay for all user ram for now
   if (rewards_it == _rewards.end()) {
-    _rewards.emplace(payer, upsert_rewards);
+    _rewards.emplace(get_self(), upsert_rewards);
   } else {
-    _rewards.modify(rewards_it, payer, upsert_rewards);
+    _rewards.modify(rewards_it, get_self(), upsert_rewards);
   }
 }
 

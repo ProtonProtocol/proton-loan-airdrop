@@ -27,7 +27,6 @@ async function action() {
           },
         ],
         data: {
-          payer: USER1_ACCOUNT,
           user: USER1_ACCOUNT,
           stakes: [`BTCUSDC`, `DOGEUSD`],
         },
@@ -42,7 +41,6 @@ async function action() {
           },
         ],
         data: {
-          payer: USER2_ACCOUNT,
           user: USER2_ACCOUNT,
           stakes: [`BTCUSDC`, `DOGEUSD`],
         },
