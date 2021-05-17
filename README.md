@@ -2,9 +2,9 @@
 
 #### Structure
 
-- [The rewards contract](./lending)
+- [The rewards contract](./rewards)
 - [The standard eosio.token contract](./eosio.token). Used for share symbols (LP tokens / interest-bearing tokens) of the markets.
-- [The Hydra tests](./js_test)
+- [The Hydra tests](./js_tests)
 
 ## Development
 
