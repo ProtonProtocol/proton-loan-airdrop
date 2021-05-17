@@ -121,19 +121,17 @@ describe("rewards", () => {
     });
     await rewards.contract.open(
       {
-        payer: rewards.accountName,
         user: user1.accountName,
         stakes: [`BTCUSDC`, `DOGEUSD`],
       },
-      [{ actor: rewards.accountName, permission: `active` }]
+      [{ actor: user1.accountName, permission: `active` }]
     );
     await rewards.contract.open(
       {
-        payer: rewards.accountName,
         user: user2.accountName,
         stakes: [`BTCUSDC`, `DOGEUSD`],
       },
-      [{ actor: rewards.accountName, permission: `active` }]
+      [{ actor: user2.accountName, permission: `active` }]
     );
   };
 
@@ -323,11 +321,10 @@ describe("rewards", () => {
     // need to enter market again because rewards was changed
     await rewards.contract.open(
       {
-        payer: rewards.accountName,
         user: user1.accountName,
         stakes: [`BTCUSDC`],
       },
-      [{ actor: rewards.accountName, permission: `active` }]
+      [{ actor: user1.accountName, permission: `active` }]
     );
 
     // end is in 1 year

@@ -269,12 +269,13 @@ Enters the specified staking markets for a user by opening relevant table entrie
 The user can only deposit to the staking markets they have entered.
 Is a no-op if the user already entered the staking market.
 
-- **authority**: `payer`
+> The contract account currently covers the user's RAM cost.
+
+- **authority**: `user`
 - **requirements**: none
 
 #### args
 
-- `{name} payer`: The account paying for any RAM increases
 - `{name} user`: The user entering the staking markets
 - `{vector<symbol_code>} stakes`: the stake symbols of the markets to enter
 
@@ -285,9 +286,8 @@ Is a no-op if the user already entered the staking market.
   "account": "stakerewards",
   "name": "open",
   "data": {
-    "payer": "payer",
     "user": "user",
-    "markets": ["BTCUSDC"]
+    "stakes": ["BTCUSDC"]
   }
 }
 ```
@@ -312,7 +312,7 @@ Exits the specified staking markets for a user by closing relevant table entries
   "name": "close",
   "data": {
     "user": "user",
-    "markets": ["BTCUSDC"]
+    "stakes": ["BTCUSDC"]
   }
 }
 ```
