@@ -22,6 +22,7 @@
 npm i -g @klevoya/hydra
 # run tests
 cd js_tests
+# adjust hydra.yml options to configure hydra server or comment out options block
 # run tests
 npm test -- rewards
 ```
