@@ -248,44 +248,43 @@ bool rewards::_claim(const name& claimer, const vector<symbol_code>& stakes) {
 
     auto rewards_it =
         _rewards.require_find(claimer.value, "enter market first");
-    vector<int64_t> accrued_rewards =
-        rewards_it->get_snapshot(stake_symbol).accrued_rewards;
-
-    for (auto i = 0; i < accrued_rewards.size(); i++) {
-      int64_t accrued_reward = accrued_rewards[i];
-      extended_symbol reward_symbol =
-          rewardscfg_it->rewards_per_half_second[i].get_extended_symbol();
-
-      // if we see this reward token for the first time, initialize
-      if (initial_reward_balance_map.count(reward_symbol) == 0) {
-        initial_reward_balance_map[reward_symbol] =
-            get_balance(get_self(), reward_symbol);
-        running_reward_balance_map[reward_symbol] =
-            get_balance(get_self(), reward_symbol);
-      }
-      extended_asset& running_reward_balance =
-          running_reward_balance_map[reward_symbol];
-
-      // there could be the case where not enough rewards were deposited
-      extended_asset to_transfer = running_reward_balance;
-      if (accrued_reward < to_transfer.quantity.amount) {
-        to_transfer.quantity.amount = accrued_reward;
-      }
-      if (to_transfer.quantity.amount <= 0)
-        continue;
-
-      has_claimed = true;
-      running_reward_balance -= to_transfer;
-      token::transfer_action transfer_act(to_transfer.contract,
-                                          {get_self(), name("active")});
-      transfer_act.send(get_self(), claimer, to_transfer.quantity,
-                        "claim " + stake_sym.to_string());
-    }
 
     _rewards.modify(rewards_it, same_payer, [&](auto& r) {
-      // claimed everything, reset
-      for (auto i = 0; i < r.stakes[stake_symbol].accrued_rewards.size(); i++) {
-        r.stakes[stake_symbol].accrued_rewards[i] = 0;
+      vector<int64_t>& accrued_rewards = r.stakes[stake_symbol].accrued_rewards;
+
+      for (auto i = 0; i < accrued_rewards.size(); i++) {
+        int64_t accrued_reward = accrued_rewards[i];
+        extended_symbol reward_symbol =
+            rewardscfg_it->rewards_per_half_second[i].get_extended_symbol();
+
+        // if we see this reward token for the first time, initialize
+        if (initial_reward_balance_map.count(reward_symbol) == 0) {
+          initial_reward_balance_map[reward_symbol] =
+              get_balance(get_self(), reward_symbol);
+          running_reward_balance_map[reward_symbol] =
+              get_balance(get_self(), reward_symbol);
+        }
+        extended_asset& running_reward_balance =
+            running_reward_balance_map[reward_symbol];
+
+        // there could be the case where not enough rewards were deposited
+        extended_asset to_transfer = running_reward_balance;
+        if (accrued_reward < to_transfer.quantity.amount) {
+          to_transfer.quantity.amount = accrued_reward;
+        }
+        if (to_transfer.quantity.amount <= 0)
+          continue;
+
+        has_claimed = true;
+        running_reward_balance -= to_transfer;
+        token::transfer_action transfer_act(to_transfer.contract,
+                                            {get_self(), name("active")});
+        transfer_act.send(get_self(), claimer, to_transfer.quantity,
+                          "claim " + stake_sym.to_string());
+
+        // claimed to_transfer, subtract
+        check(to_transfer.quantity.amount <= accrued_rewards[i], "should never happen");
+        accrued_rewards[i] -= to_transfer.quantity.amount;
       }
     });
   }
