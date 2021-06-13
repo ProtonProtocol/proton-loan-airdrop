@@ -1,6 +1,6 @@
 <template>
     <div class="flex bg-gray-900">
-        <div class="hidden sm:flex justify-center items-center bg-gray-900 h-full sm:max-w-4xl">
+        <div class="hidden sm:flex justify-center items-center bg-gray-900 h-full w-1/2">
             <img
                 class="sm:p-12"
                 src="@/assets/banner.png"
@@ -8,7 +8,7 @@
             />
             <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-600 mix-blend-multiply" />
         </div>
-        <div class="flex justify-center items-center mx-auto max-w-md p-12">
+        <div class="flex justify-center items-center mx-auto w-full sm:w-1/2 p-12">
             <div>
                 <h2 class="text-base font-semibold uppercase tracking-wider text-gray-300">
                     Easy to use wallet
