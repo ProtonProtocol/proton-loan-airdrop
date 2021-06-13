@@ -24,9 +24,15 @@
         </p>
       </div>
       <div class="mt-12 lg:mt-0 lg:col-span-2 flex items-end justify-end">
-        <blockquote class="twitter-tweet">
-          <p lang="en" dir="ltr">The Proton Lend network will utilize <a href="https://twitter.com/search?q=%24LOAN&amp;src=ctag&amp;ref_src=twsrc%5Etfw">$LOAN</a> as its governance token, allowing users to vote on which X-tokens can be added to liquidity pools, what the interest rates will be, and more.<br>The LOAN Airdrop is scheduled for June 15th, with the Proton Lend network following soon after. <a href="https://t.co/z6iFfw9SYB">pic.twitter.com/z6iFfw9SYB</a></p>&mdash; Proton (@protonxpr) <a href="https://twitter.com/protonxpr/status/1403799217030668288?ref_src=twsrc%5Etfw">June 12, 2021</a>
-        </blockquote>
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/b-whqv30Re8"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        />
       </div>
     </div>
   </div>
