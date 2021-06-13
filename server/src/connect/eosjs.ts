@@ -52,7 +52,7 @@ export async function _get_long_stakes (lower_bound: any = undefined): Promise<L
 
 function parse_long_stakes (longStakes: LongStakeRow[], plan_index?: number) {
   return longStakes
-    .filter((longStake: any) => !plan_index || longStake.plan_index === plan_index)
+    .filter((longStake: any) => plan_index === undefined || longStake.plan_index === plan_index)
     .map((longStake: any) => ({
       account: longStake.account,
       amount: +longStake.staked.split(' ')[0]
