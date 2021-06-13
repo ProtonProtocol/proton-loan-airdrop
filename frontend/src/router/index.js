@@ -9,10 +9,6 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/airdrop'
-    },
-    {
-      path: '/airdrop',
       name: 'Airdrop',
       component: Airdrop
     }
