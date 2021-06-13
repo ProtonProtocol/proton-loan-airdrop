@@ -3,7 +3,7 @@
         <div class="hidden sm:flex justify-center items-center bg-gray-900 h-full w-1/2">
             <img
                 class="sm:p-12"
-                src="@/assets/banner.png"
+                src="@/assets/download-banner.png"
                 alt="Proton Wallet"
             />
             <!-- <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-600 mix-blend-multiply" /> -->
