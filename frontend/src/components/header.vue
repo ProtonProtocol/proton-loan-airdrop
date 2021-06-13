@@ -10,7 +10,7 @@
         </div>
 
         <nav class="flex space-x-10 justify-center">
-          <router-link to="/airdrop" class="text-base font-medium text-gray-500 hover:text-purple-900">
+          <router-link to="/" class="text-base font-medium text-gray-500 hover:text-purple-900">
             LOAN Airdrop
           </router-link>
         </nav>
