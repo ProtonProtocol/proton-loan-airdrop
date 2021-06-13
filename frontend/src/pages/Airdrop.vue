@@ -3,6 +3,7 @@
     <Hero/>
     <FeatureList/>
     <MoreInformation/>
+    <DownloadWallet/>
   </div>
 </template>
 
@@ -10,6 +11,7 @@
 import MoreInformation from '@/components/moreInformation'
 import Hero from '@/components/Hero'
 import FeatureList from '@/components/featureList'
+import DownloadWallet from '@/components/downloadWallet'
 
 export default {
   name: 'Airdrop',
@@ -17,7 +19,8 @@ export default {
   components: {
     MoreInformation,
     Hero,
-    FeatureList
+    FeatureList,
+    DownloadWallet
   }
 }
 </script>
