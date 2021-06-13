@@ -20,6 +20,8 @@ export const MARIADB_CONFIG_2 = {
     database: process.env.MARIADB_DATABASE_2
 }
 
+console.log(MARIADB_CONFIG_1, MARIADB_CONFIG_2)
+
 export const LIGHT_API_WS = 'wss://lightapi.eosamsterdam.net/wsapi'
 export const ENDPOINT = 'https://proton.eoscafeblock.com'
 
