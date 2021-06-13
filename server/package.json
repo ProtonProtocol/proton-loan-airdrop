@@ -18,9 +18,9 @@
     "prepare": "tsdx build --tsconfig ./tsconfig-build.json && cp -R src/outputs dist/outputs",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "loan": "CREATE_OUTPUTS=true CREATE_OUTPUTS_LOAN=true ts-node src/index.ts",
-    "loanloop": "CREATE_OUTPUTS_LOOP_TIME=10000 CREATE_OUTPUTS=true CREATE_OUTPUTS_LOAN=true ts-node src/index.ts",
-    "airdrop": "EXECUTE_LOAN_AIRDROP=true ts-node src/index.ts"
+    "loan": "CREATE_OUTPUTS=true CREATE_OUTPUTS_LOAN=true node -r ts-node/register -r dotenv/config src/index.ts",
+    "loanloop": "CREATE_OUTPUTS_LOOP_TIME=10000 CREATE_OUTPUTS=true CREATE_OUTPUTS_LOAN=true node -r ts-node/register -r dotenv/config src/index.ts",
+    "airdrop": "EXECUTE_LOAN_AIRDROP=true node -r ts-node/register -r dotenv/config src/index.ts"
   },
   "peerDependencies": {},
   "husky": {
@@ -52,6 +52,7 @@
     "@types/lodash.chunk": "^4.2.6",
     "husky": "^6.0.0",
     "size-limit": "^4.11.0",
+    "ts-node": "^10.0.0",
     "tsdx": "^0.14.1",
     "tslib": "^2.2.0",
     "typescript": "^4.2.3"

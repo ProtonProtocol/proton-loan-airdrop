@@ -10,7 +10,10 @@ module.exports = {
         'CREATE_OUTPUTS': true,
         'CREATE_OUTPUTS_LOAN': true
       },
-      node_args: '--max_old_space_size=4096'
+      node_args: [
+        '--max_old_space_size=4096',
+        '-r dotenv/config'
+      ]
     }
   ]
 };
