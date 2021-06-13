@@ -9,7 +9,7 @@
             <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-600 mix-blend-multiply" />
         </div>
         <div class="flex justify-center items-center mx-auto w-full sm:w-1/2 p-12">
-            <div>
+            <div class="max-w-md">
                 <h2 class="text-base font-semibold uppercase tracking-wider text-gray-300">
                     Easy to use wallet
                 </h2>
