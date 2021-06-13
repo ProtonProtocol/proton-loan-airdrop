@@ -6,7 +6,7 @@
                 src="@/assets/banner.png"
                 alt="Proton Wallet"
             />
-            <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-600 mix-blend-multiply" />
+            <!-- <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-600 mix-blend-multiply" /> -->
         </div>
         <div class="flex justify-center items-center mx-auto w-full sm:w-1/2 p-12">
             <div class="max-w-md">
