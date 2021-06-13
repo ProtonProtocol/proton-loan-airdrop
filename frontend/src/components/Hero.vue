@@ -65,7 +65,7 @@
                     </div>
                     <div class="relative flex justify-center text-sm">
                       <span class="px-2 bg-white text-gray-500">
-                        Or
+                        AND
                       </span>
                     </div>
                   </div>

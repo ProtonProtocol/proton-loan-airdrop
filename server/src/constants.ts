@@ -77,7 +77,6 @@ export const BLACKLIST = [
     'newdexwallet',
     'oracles',
     'proton.wrap',
-    'protonnz',
     'protonvoting',
     'randreceiver',
     'resources',
@@ -89,14 +88,8 @@ export const BLACKLIST = [
     'tippedtipped',
     'token.proton',
     'yield.farms',
-    'caseygrooms',
-    'coinabis',
     'eosio.token',
     'proton.swaps',
-    'sense',
-    'spacedemon',
-    'thomashp',
-    'xsol',
     'xtokens',
 ]
 
