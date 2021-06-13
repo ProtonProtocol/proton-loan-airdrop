@@ -66,14 +66,15 @@
 
                   <div class="mt-6 space-y-6">
                     <div>
-                      <label for="name" class="sr-only">Full name</label>
+                      <label for="name" class="sr-only">Proton Account</label>
                       <input
+                        v-model="protonAccount"
                         class="py-4 block w-full shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm border-gray-300 rounded-md"
                         type="text" name="name" id="name" autocomplete="name" placeholder="Proton Account" required="" />
                     </div>
 
                     <div>
-                      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                      <button @click="checkAllocation" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                         Check Allocation
                       </button>
                     </div>
@@ -85,17 +86,35 @@
         </div>
       </main>
     </div>
+
+    <AirdropModal
+      v-if="allocation"
+      @modal-close="allocation = undefined"
+      :allocation="allocation"
+    />
   </div>
 </template>
 
 <script>
 import { DateTime } from 'luxon'
-
+import AirdropModal from './airdropModal.vue'
 export default {
+  components: {
+    AirdropModal
+  },
+
   data () {
     return {
       airdropTime: DateTime.utc(2021, 6, 15, 7),
-      now: DateTime.utc()
+      now: DateTime.utc(),
+      allocation: undefined,
+      protonAccount: undefined
+    }
+  },
+
+  watch: {
+    protonAccount () {
+      this.allocation = undefined
     }
   },
 
@@ -103,6 +122,23 @@ export default {
     timeToAirdrop () {
       const time = this.airdropTime.diff(this.now, ['hours', 'minutes', 'seconds'])
       return time
+    }
+  },
+
+  methods: {
+    async checkAllocation () {
+      if (!this.protonAccount) {
+        return
+      }
+
+      const res = await fetch(`https://www.api.bloks.io/proton/airdrop/${this.protonAccount}`)
+
+      try {
+        this.allocation = await res.json()
+        console.log(this.allocation)
+      } catch (e) {
+        this.allocation = undefined
+      }
     }
   },
 
