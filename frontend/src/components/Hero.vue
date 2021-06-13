@@ -18,7 +18,7 @@
               <div>
                 <a href="https://jobs.lever.co/metalpay" target="_blank" class="inline-flex items-center text-white bg-gray-900 rounded-full p-1 pr-2 sm:text-base lg:text-sm xl:text-base hover:text-gray-200">
                   <span class="px-3 py-0.5 text-white text-xs font-semibold leading-5 uppercase tracking-wide bg-purple-500 rounded-full">We're hiring</span>
-                  <span class="ml-4 text-sm">Visit our careers page</span>
+                  <span class="ml-4 mr-3 text-sm">Visit our careers page</span>
                 </a>
                 <h1 class="mt-4 text-4xl tracking-tight font-extrabold text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                   <span class="md:block">Get ready for your</span>
