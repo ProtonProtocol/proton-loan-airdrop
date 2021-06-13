@@ -1,5 +1,6 @@
 const path = require('path'); 
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+console.log(path.join(__dirname, '..', '.env'))
 
 import { saveLoanAirdrop } from './actions/save'
 import { Account, BalanceRow, AccountLoan, Accounts, accountParser, accountLoanParser } from './parsers'
