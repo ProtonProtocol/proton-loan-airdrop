@@ -111,7 +111,7 @@ export default {
 
   data () {
     return {
-      airdropTime: DateTime.utc(2021, 6, 15, 7),
+      airdropTime: DateTime.utc(2021, 6, 15, 19),
       now: DateTime.utc(),
       allocation: undefined,
       protonAccount: undefined
