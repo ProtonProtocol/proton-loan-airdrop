@@ -131,11 +131,12 @@ export default {
         return
       }
 
-      const res = await fetch(`https://www.api.bloks.io/proton/airdrop/${this.protonAccount}`)
+      const account = this.protonAccount.trim().toLowerCase()
+
+      const res = await fetch(`https://www.api.bloks.io/proton/airdrop/${account}`)
 
       try {
         this.allocation = await res.json()
-        console.log(this.allocation)
       } catch (e) {
         this.allocation = undefined
       }
