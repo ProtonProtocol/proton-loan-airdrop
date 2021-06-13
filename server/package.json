@@ -1,0 +1,73 @@
+{
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build --tsconfig ./tsconfig-build.json && cp -R src/outputs dist/outputs",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "loan": "CREATE_OUTPUTS=true CREATE_OUTPUTS_LOAN=true ts-node src/index.ts",
+    "loanloop": "CREATE_OUTPUTS_LOOP_TIME=10000 CREATE_OUTPUTS=true CREATE_OUTPUTS_LOAN=true ts-node src/index.ts",
+    "airdrop": "EXECUTE_LOAN_AIRDROP=true ts-node src/index.ts"
+  },
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "loan-airdrop",
+  "author": "Syed Jafri",
+  "module": "dist/loan-airdrop.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/loan-airdrop.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/loan-airdrop.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^4.11.0",
+    "@types/lodash.chunk": "^4.2.6",
+    "husky": "^6.0.0",
+    "size-limit": "^4.11.0",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@eoscafe/light-api": "^3.2.12",
+    "@proton/js": "^22.0.64",
+    "@types/node-fetch": "^2.5.10",
+    "bignumber.js": "^9.0.1",
+    "csv-stringify": "^5.6.2",
+    "dotenv": "^10.0.0",
+    "jsonrpc2-ws": "^1.0.0-beta18",
+    "lodash.chunk": "^4.2.0",
+    "mariadb": "^2.5.3",
+    "mysql2": "^2.2.5",
+    "node-fetch": "^2.6.1",
+    "zod": "^3.1.0"
+  }
+}
