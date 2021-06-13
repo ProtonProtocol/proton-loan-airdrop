@@ -38,7 +38,7 @@
                       LOAN Snapshot in:
                     </p>
 
-                    <div class="mt-1 grid grid-cols-3 gap-3">
+                    <div class="mt-1 grid grid-cols-3 gap-3" v-if="timeToAirdrop.values.hours > 0">
                       <div class="text-3xl text-purple-500">
                         {{ timeToAirdrop.values.hours }} hrs
                       </div>
@@ -49,6 +49,12 @@
 
                       <div class="text-3xl text-purple-500">
                         {{ timeToAirdrop.values.seconds.toFixed(0) }} secs
+                      </div>
+                    </div>
+
+                    <div class="mt-1" v-else>
+                      <div class="text-3xl text-purple-500">
+                        Snapshot Complete!
                       </div>
                     </div>
                   </div>
