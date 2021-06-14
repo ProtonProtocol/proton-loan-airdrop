@@ -25,6 +25,7 @@
       </div>
       <div class="mt-12 lg:mt-0 lg:col-span-2 flex items-end justify-end">
         <iframe
+          class="rounded-lg"
           width="560"
           height="315"
           src="https://www.youtube.com/embed/b-whqv30Re8"
