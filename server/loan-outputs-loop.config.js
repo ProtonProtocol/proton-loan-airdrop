@@ -6,9 +6,9 @@ module.exports = {
       node_args : '-r dotenv/config',
       watch: false,
       env: {
+        'CREATE_OUTPUTS': true,
+        'CREATE_OUTPUTS_LOAN': true,
         'CREATE_OUTPUTS_LOOP_TIMER': 5 * 60 * 1000,
-        'CREATE_AIRDROP_OUTPUTS': true,
-        'CREATE_OUTPUTS_LOAN': true
       },
       // node_args: '--max_old_space_size=4096'
     }
