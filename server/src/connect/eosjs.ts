@@ -8,11 +8,13 @@ export const api = new Api({ rpc, signatureProvider: new JsSignatureProvider(PRI
 
 export const processAirdrop = async (airdrops: AccountLoan[]) => {
   const airdropsToProcess = airdrops
-    .filter(airdrop => airdrop.loanDistributed === 0)
+    .filter(airdrop => airdrop.loanDistributed === 0 && airdrop.totalLoan > 0)
     .map(airdrop => ({
       account: airdrop.account,
       amount: `${airdrop.totalLoan.toFixed(LOAN_TOKEN_PRECISION)} ${LOAN_TOKEN_SYMBOL}`, 
     }))
+
+  console.dir(airdropsToProcess, { depth: null })
 
   if (!airdropsToProcess.length) {
     return
