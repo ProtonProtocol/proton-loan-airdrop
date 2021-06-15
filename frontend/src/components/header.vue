@@ -1,23 +1,19 @@
 <template>
   <div class="relative bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
-      <div class="flex justify-between items-center border-b border-gray-200 py-6 md:justify-start md:space-x-10">
+      <div class="flex justify-between items-center border-b border-gray-200 py-6 md:justify-start md:space-x-4">
         <div class="flex justify-start">
           <router-link to="/">
             <span class="sr-only">Proton</span>
-            <img class="w-auto h-8 sm:h-10" src="@/assets/logo.svg" alt="">
+            <img class="w-auto h-12" src="@/assets/loan.tokenLOAN2.png" alt="">
           </router-link>
         </div>
 
-        <nav class="flex space-x-10 justify-center">
+        <div class="flex space-x-4 justify-center">
           <router-link to="/" class="text-base font-medium text-gray-500 hover:text-purple-900">
             LOAN Airdrop
           </router-link>
-        </nav>
-
-        <!-- <div class="flex items-center justify-end space-x-8 md:flex-1 lg:w-0">
-          <Avatar/>
-        </div> -->
+        </div>
       </div>
     </div>
   </div>
