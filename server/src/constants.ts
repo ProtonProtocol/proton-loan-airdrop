@@ -91,6 +91,8 @@ export const BLACKLIST = [
     'eosio.token',
     'proton.swaps',
     'xtokens',
+    'fees.newdex',
+    'fee.swaps'
 ]
 
 export const VESTING_INPUTS = [
