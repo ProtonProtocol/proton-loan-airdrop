@@ -42,8 +42,6 @@ The Proton lending protocol provides two types of loans:
 
 ## Tables
 
-<details>
-  <summary>Show Tables</summary>
 
 ### TABLE `markets`
 
@@ -180,12 +178,7 @@ The Proton lending protocol provides two types of loans:
 }
 ```
 
-</details>
-
 ## Actions
-
-<details>
-  <summary>Show User Actions</summary>
 
 ### DEPOSIT SHARES (COLLATERAL)
 
@@ -558,12 +551,6 @@ Exits the specified markets for a user by closing relevant table entries for the
   }
 }
 ```
-
-</details>
-
-<details>
-  <summary>Show Admin Actions</summary>
-
 ### CREATE MARKET
 
 Creates a new market.
@@ -747,5 +734,3 @@ There are several actions to set configuration parameters of the global lending 
   }
 }
 ```
-
-</details>
