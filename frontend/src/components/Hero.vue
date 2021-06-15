@@ -38,7 +38,7 @@
                       LOAN Snapshot in:
                     </p>
 
-                    <div class="mt-1 grid grid-cols-3 gap-3" v-if="timeToAirdrop.values.hours > 0">
+                    <div class="mt-1 grid grid-cols-3 gap-3" v-if="timeToAirdrop.values.hours > 0 || timeToAirdrop.values.minutes > 0 || timeToAirdrop.values.seconds > 0">
                       <div class="text-3xl text-purple-500">
                         {{ timeToAirdrop.values.hours }} hrs
                       </div>
