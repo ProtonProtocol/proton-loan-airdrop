@@ -15,7 +15,7 @@ interface BalanceRaw {
 export async function get_token_holders(contract: string, currency: string): Promise<BalanceRow[]> {
     let balances: BalanceRaw[] = []
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         client.methods.set("reqdata", (_: any, params: any) => {
             if (params.end) {
                 const data = balances.map((balance: { account: string; amount: string }) => ({
@@ -37,7 +37,7 @@ export async function get_token_holders(contract: string, currency: string): Pro
             })
         } catch (err) {
             console.error(err)
-            reject(err)
+            process.exit(0)
         }
     })
 }
