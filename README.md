@@ -37,8 +37,6 @@ The interest model consists of two linear functions merged at the optimal utilis
 The Proton lending protocol provides two types of loans:
 
 - **Variable Loans**: The borrowing rate depends on the current utilization rate and therefore fluctuates over time. Note that all borrowers of the same market also pay the same borrow rates on all of their loans.
-- **Stable Loans**: The protocol also offers _fixed-rate_ stable loans. These loans have a higher borrow rate than variable borrows but the rate is locked in and the borrowing rate does not fluctuate over time.
-  > Note that under special circumstances of lenders not earning enough interest, even the stable loan rates can be rebalanced.
 
 ## Tables
 
