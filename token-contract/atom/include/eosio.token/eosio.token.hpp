@@ -37,19 +37,6 @@ namespace eosio {
                       const asset&  maximum_supply);
 
          /**
-          * Set new issuer for token
-          *
-          * @param issuer - the account that creates the token,
-          * @param sym - the symbol
-          *
-          * @pre Token symbol has to be valid,
-          * @pre Token symbol must be already created,
-          */
-         [[eosio::action]]
-         void setissuer( const name&   issuer,
-                         const symbol&  sym);
-
-         /**
           *  This action issues to `to` account a `quantity` of tokens.
           *
           * @param to - the account to issue tokens to, it must be the same as the issuer,
