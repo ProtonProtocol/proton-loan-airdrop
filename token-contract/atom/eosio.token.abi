@@ -110,20 +110,6 @@
             ]
         },
         {
-            "name": "setissuer",
-            "base": "",
-            "fields": [
-                {
-                    "name": "issuer",
-                    "type": "name"
-                },
-                {
-                    "name": "sym",
-                    "type": "symbol"
-                }
-            ]
-        },
-        {
             "name": "transfer",
             "base": "",
             "fields": [
@@ -171,11 +157,6 @@
             "name": "retire",
             "type": "retire",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Remove Tokens from Circulation\nsummary: 'Remove {{nowrap quantity}} from circulation'\nicon: /\n---\n\nThe token manager agrees to remove {{quantity}} from circulation, taken from their own account.\n\n{{#if memo}} There is a memo attached to the action stating:\n{{memo}}\n{{/if}}"
-        },
-        {
-            "name": "setissuer",
-            "type": "setissuer",
-            "ricardian_contract": ""
         },
         {
             "name": "transfer",

@@ -14,32 +14,12 @@ void token::create( const name&   issuer,
 
     stats statstable( get_self(), sym.code().raw() );
     auto existing = statstable.find( sym.code().raw() );
-    check( existing == statstable.end(), "token with symbol already exists" );
 
-    statstable.emplace( get_self(), [&]( auto& s ) {
-       s.supply.symbol = maximum_supply.symbol;
-       // s.max_supply    = maximum_supply;    // PROTON
-       s.max_supply    = asset{0, sym};        // PROTON
+    statstable.modify(existing, get_self(), [&]( auto& s ) {
        s.issuer        = issuer;
     });
 }
 
-// PROTON
-void token::setissuer( const name&   issuer,
-                       const symbol&   sym )
-{
-    require_auth( get_self() );
-
-    check( sym.is_valid(), "invalid symbol name" );
-
-    stats statstable( get_self(), sym.code().raw() );
-    auto existing = statstable.find( sym.code().raw() );
-    check( existing != statstable.end(), "token with symbol does not exist" );
-
-    statstable.modify( existing, get_self(), [&]( auto& s ) {
-       s.issuer        = issuer;
-    });
-}
 
 void token::issue( const name& to, const asset& quantity, const string& memo )
 {
