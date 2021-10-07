@@ -1,0 +1,265 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.1",
+    "types": [],
+    "structs": [
+        {
+            "name": "claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "claimer",
+                    "type": "name"
+                },
+                {
+                    "name": "stakes",
+                    "type": "symbol_code[]"
+                }
+            ]
+        },
+        {
+            "name": "close",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "stakes",
+                    "type": "symbol_code[]"
+                }
+            ]
+        },
+        {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "globals_config",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "open",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "stakes",
+                    "type": "symbol_code[]"
+                }
+            ]
+        },
+        {
+            "name": "pair_extended_symbol_reward_snapshot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "value",
+                    "type": "reward_snapshot"
+                }
+            ]
+        },
+        {
+            "name": "reward",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "stakes",
+                    "type": "pair_extended_symbol_reward_snapshot[]"
+                }
+            ]
+        },
+        {
+            "name": "reward_snapshot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "int64"
+                },
+                {
+                    "name": "accrued_rewards",
+                    "type": "int64[]"
+                },
+                {
+                    "name": "reward_indices",
+                    "type": "float64[]"
+                }
+            ]
+        },
+        {
+            "name": "rewards_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total_staked",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "rewards_per_half_second",
+                    "type": "extended_asset[]"
+                },
+                {
+                    "name": "reward_indices",
+                    "type": "float64[]"
+                },
+                {
+                    "name": "reward_time",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "setrewards",
+            "base": "",
+            "fields": [
+                {
+                    "name": "stake_symbol",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "rewards_per_half_second",
+                    "type": "extended_asset[]"
+                }
+            ]
+        },
+        {
+            "name": "update",
+            "base": "",
+            "fields": [
+                {
+                    "name": "stake_symbols",
+                    "type": "symbol_code[]"
+                }
+            ]
+        },
+        {
+            "name": "update_user",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "withdrawer",
+                    "type": "name"
+                },
+                {
+                    "name": "token",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
+            "name": "withdraw_rewards",
+            "base": "",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "token",
+                    "type": "extended_asset"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "claim",
+            "type": "claim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "close",
+            "type": "close",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "open",
+            "type": "open",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setrewards",
+            "type": "setrewards",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "update",
+            "type": "update",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "update.user",
+            "type": "update_user",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Withdraw\nsummary: 'Withdraw'\nicon:\n---\n."
+        },
+        {
+            "name": "withdraw.rew",
+            "type": "withdraw_rewards",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "globals.cfg",
+            "type": "globals_config",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "rewards",
+            "type": "reward",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "rewards.cfg",
+            "type": "rewards_config",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": []
+}
