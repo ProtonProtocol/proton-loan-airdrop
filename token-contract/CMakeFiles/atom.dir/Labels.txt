@@ -1,14 +1,14 @@
 # Target labels
  atom
 # Source files and their labels
-/Users/jafri/proton-loan-airdrop/token-contract/CMakeFiles/atom
-/Users/jafri/proton-loan-airdrop/token-contract/CMakeFiles/atom.rule
-/Users/jafri/proton-loan-airdrop/token-contract/CMakeFiles/atom-complete.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-install.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-mkdir.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-download.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-update.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-patch.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-configure.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-build.rule
-/Users/jafri/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-test.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/CMakeFiles/atom
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/CMakeFiles/atom.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/CMakeFiles/atom-complete.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-build.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-configure.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-download.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-install.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-mkdir.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-patch.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-test.rule
+/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/atom-prefix/src/atom-stamp/atom-update.rule

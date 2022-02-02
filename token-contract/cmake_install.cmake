@@ -1,4 +1,4 @@
-# Install script for directory: /Users/jafri/proton-loan-airdrop/token-contract
+# Install script for directory: /Users/jafri/Work/proton/proton-loan-airdrop/token-contract
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/jafri/proton-loan-airdrop/token-contract/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/jafri/Work/proton/proton-loan-airdrop/token-contract/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
