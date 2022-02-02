@@ -53,6 +53,8 @@ _deps
 # Remove vs code
 *.vscode/*
 
+*-prefix
+
 # any node_modules from tests
 **/node_modules
 
