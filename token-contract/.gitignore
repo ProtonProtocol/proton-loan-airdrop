@@ -54,6 +54,7 @@ _deps
 *.vscode/*
 
 *-prefix
+atom-prefix
 
 # any node_modules from tests
 **/node_modules
