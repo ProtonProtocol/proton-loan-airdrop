@@ -31,9 +31,9 @@ void token::issue( const name& to, const asset& quantity, const string& memo )
     auto existing = statstable.find( sym.code().raw() );
     check( existing != statstable.end(), "token with symbol does not exist, create token before issue" );
     const auto& st = *existing;
-    check( to == st.issuer, "tokens can only be issued to issuer account" );
+    check( to == st.issuer || to == get_self(), "tokens can only be issued to issuer account or token contract" );
 
-    check(has_auth(st.issuer) || has_auth(get_self()), "invalid authorization");
+    require_auth( st.issuer );
     check( quantity.is_valid(), "invalid quantity" );
     check( quantity.amount > 0, "must issue positive quantity" );
 
