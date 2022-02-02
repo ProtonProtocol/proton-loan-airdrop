@@ -46,7 +46,7 @@ void token::issue( const name& to, const asset& quantity, const string& memo )
        s.supply += quantity;
     });
 
-    add_balance( st.issuer, quantity, st.issuer );
+    add_balance( to, quantity, to );
 }
 
 void token::retire( const asset& quantity, const string& memo )
