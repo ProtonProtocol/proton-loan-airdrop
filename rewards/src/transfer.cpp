@@ -11,14 +11,20 @@ void rewards::on_transfer(const name& from, const name& to,
   // Validate transfer
   check(to == get_self(), "invalid to account");
 
-  // Skip if deposit from system accounts
-  if (from == "eosio.stake"_n || from == "eosio.ram"_n || from == "eosio"_n) {
-    return;
-  }
-
   // Deposit
   name token_contract = get_first_receiver();
   auto token = extended_asset(quantity, token_contract);
+
+  // Special eosio exclusion
+  if (from == "eosio"_n) {
+    deposit_rewards(token);
+    return;
+  }
+
+  // Skip if deposit from system accounts
+  if (from == "eosio.stake"_n || from == "eosio.ram"_n) {
+    return;
+  }
 
   std::string trimmed_memo = memo;
   trim(trimmed_memo);

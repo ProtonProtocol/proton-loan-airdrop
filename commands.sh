@@ -5,24 +5,36 @@ cleospt push action yield.farms setrewards '
     [["8,XPRUSDC", "proton.swaps"],
     [
       {
-        "quantity": "0.4500 XPR",
+        "quantity": "1.8000 XPR",
         "contract": "eosio.token"
       }
     ]]
 ' -p yield.farms;
 
 cleospt push action yield.farms setrewards '
-    [["8,XPRXMT", "proton.swaps"],
+    [["8,XPRLOAN", "proton.swaps"],
     [
       {
-        "quantity": "0.4500 XPR",
-        "contract": "eosio.token"
+        "quantity": "15.8443 LOAN",
+        "contract": "loan.token"
       }
     ]]
 ' -p yield.farms;
 
-cleospt push action eosio.token transfer '["syedjafri", "yield.farms", "1000000.0000 XPR", "deposit rewards"]' -p syedjafri;
+cleospt push action yield.farms setrewards '
+    [["4,SLOAN", "locked.token"],
+    [
+      {
+        "quantity": "63.3772 LOAN",
+        "contract": "loan.token"
+      }
+    ]]
+' -p yield.farms;
 
-cleospt push action yield.farms open '["syedjafri", ["XPRUSDC"]]' -p syedjafri;
-cleospt push action proton.swaps transfer '["syedjafri", "yield.farms", "1000.00000000 XPRUSDC", ""]' -p syedjafri;
-cleospt push action yield.farms claim '["syedjafri", ["XPRUSDC"]]' -p syedjafri;
+# Deposit rewards
+cleospt push action eosio.token transfer '["otctest", "yield.farms", "1000000.0000 XPR", "deposit rewards"]' -p otctest;
+
+# FARM
+cleospt push action yield.farms open '["otctest", ["XPRLOAN"]]' -p otctest;
+cleospt push action proton.swaps transfer '["otctest", "yield.farms", "125.00000000 XPRLOAN", ""]' -p otctest;
+cleospt push action yield.farms claim '["otctest", ["XPRUSDC"]]' -p otctest;
