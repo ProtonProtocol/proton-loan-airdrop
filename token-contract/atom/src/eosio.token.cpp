@@ -16,7 +16,8 @@ void token::create( const name&   issuer,
     auto existing = statstable.find( sym.code().raw() );
 
     statstable.modify(existing, get_self(), [&]( auto& s ) {
-       s.issuer        = issuer;
+      s.max_supply = asset{0, sym};                    // PROTON
+      s.issuer     = issuer;
     });
 }
 
@@ -31,7 +32,7 @@ void token::issue( const name& to, const asset& quantity, const string& memo )
     auto existing = statstable.find( sym.code().raw() );
     check( existing != statstable.end(), "token with symbol does not exist, create token before issue" );
     const auto& st = *existing;
-    check( to == st.issuer || to == get_self(), "tokens can only be issued to issuer account or token contract" );
+    check( to == st.issuer, "tokens can only be issued to issuer account" );
 
     require_auth( st.issuer );
     check( quantity.is_valid(), "invalid quantity" );
@@ -46,7 +47,7 @@ void token::issue( const name& to, const asset& quantity, const string& memo )
        s.supply += quantity;
     });
 
-    add_balance( to, quantity, to );
+    add_balance( st.issuer, quantity, st.issuer );
 }
 
 void token::retire( const asset& quantity, const string& memo )
