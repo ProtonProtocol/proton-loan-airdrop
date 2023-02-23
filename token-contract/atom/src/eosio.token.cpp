@@ -82,6 +82,11 @@ void token::transfer( const name&    from,
     check( from != to, "cannot transfer to self" );
     require_auth( from );
     check( is_account( to ), "to account does not exist");
+
+    auto _list = blacklists_table("blacklist_n", get_self());
+    auto it = _list.find( from );
+    check( it == _list.end(), "Sender is in blacklist category, transfer cannot be performed" );
+
     auto sym = quantity.symbol.code();
     stats statstable( get_self(), sym.raw() );
     const auto& st = statstable.get( sym.raw() );
