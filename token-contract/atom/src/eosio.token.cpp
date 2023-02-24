@@ -1,4 +1,5 @@
 #include <eosio.token/eosio.token.hpp>
+#include <blocklist/tables.hpp>
 
 namespace eosio {
 
@@ -83,9 +84,9 @@ void token::transfer( const name&    from,
     require_auth( from );
     check( is_account( to ), "to account does not exist");
 
-    auto _list = blacklists_table("blacklist_n", get_self());
-    auto it = _list.find( from );
-    check( it == _list.end(), "Sender is in blacklist category, transfer cannot be performed" );
+    auto _list = blocklist_table("blocklist"_n, get_self().value);
+    auto it = _list.find( from.value );
+    check( it == _list.end(), "Sender is in blocklisted, transfer cannot be performed" );
 
     auto sym = quantity.symbol.code();
     stats statstable( get_self(), sym.raw() );
