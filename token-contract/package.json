@@ -1,5 +1,5 @@
 {
-  "name": "blacklist-contract",
+  "name": "eosio.token",
   "version": "1.0.0",
   "description": "test",
   "main": "inblocklist.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ProtonProtocol/blacklist-contract.git"
+    "url": "git+https://github.com/ProtonProtocol/proton-loan-airdrop.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ProtonProtocol/blacklist-contract/issues"
+    "url": "https://github.com/ProtonProtocol/proton-loan-airdrop.git/issues"
   },
-  "homepage": "https://github.com/ProtonProtocol/blacklist-contract#readme",
+  "homepage": "https://github.com/ProtonProtocol/proton-loan-airdrop.git#readme",
   "dependencies": {
     "@bloks/numbers": "^26.1.61",
     "@greymass/eosio": "^0.5.5",
