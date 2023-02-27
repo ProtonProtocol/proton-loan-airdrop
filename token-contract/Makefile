@@ -117,17 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named atom
+# Target rules for targets named eosio.token
 
 # Build rule for target.
-atom: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 atom
-.PHONY : atom
+eosio.token: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 eosio.token
+.PHONY : eosio.token
 
 # fast build rule for target.
-atom/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/atom.dir/build.make CMakeFiles/atom.dir/build
-.PHONY : atom/fast
+eosio.token/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/eosio.token.dir/build.make CMakeFiles/eosio.token.dir/build
+.PHONY : eosio.token/fast
+
+atom/src/eosio.token.o: atom/src/eosio.token.cpp.o
+.PHONY : atom/src/eosio.token.o
+
+# target to build an object file
+atom/src/eosio.token.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/eosio.token.dir/build.make CMakeFiles/eosio.token.dir/atom/src/eosio.token.cpp.o
+.PHONY : atom/src/eosio.token.cpp.o
+
+atom/src/eosio.token.i: atom/src/eosio.token.cpp.i
+.PHONY : atom/src/eosio.token.i
+
+# target to preprocess a source file
+atom/src/eosio.token.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/eosio.token.dir/build.make CMakeFiles/eosio.token.dir/atom/src/eosio.token.cpp.i
+.PHONY : atom/src/eosio.token.cpp.i
+
+atom/src/eosio.token.s: atom/src/eosio.token.cpp.s
+.PHONY : atom/src/eosio.token.s
+
+# target to generate assembly for a file
+atom/src/eosio.token.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/eosio.token.dir/build.make CMakeFiles/eosio.token.dir/atom/src/eosio.token.cpp.s
+.PHONY : atom/src/eosio.token.cpp.s
 
 # Help Target
 help:
@@ -137,7 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... atom"
+	@echo "... eosio.token"
+	@echo "... atom/src/eosio.token.o"
+	@echo "... atom/src/eosio.token.i"
+	@echo "... atom/src/eosio.token.s"
 .PHONY : help
 
 
