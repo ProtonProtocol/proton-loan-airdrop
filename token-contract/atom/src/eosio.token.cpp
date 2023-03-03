@@ -2,7 +2,7 @@
 #include <blocklist/tables.hpp>
 
 namespace eosio {
-  static constexpr name BLOCKLIST_CONTRACT = "blocklist"_n;
+static constexpr name BLOCKLIST_CONTRACT = "blocklist"_n;
 
 void token::create( const name&   issuer,
                     const asset&  maximum_supply )
@@ -20,7 +20,7 @@ void token::create( const name&   issuer,
 
     statstable.emplace( get_self(), [&]( auto& s ) {
        s.supply.symbol = maximum_supply.symbol;
-       s.max_supply    = maximum_supply;
+       s.max_supply    = asset{0, sym};;
        s.issuer        = issuer;
     });
 }

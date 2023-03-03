@@ -22,11 +22,12 @@ beforeEach(async () => {
  describe('eos-vm', () => {
   describe('token create, issue and transfer', () => {
     it('create tokens', async () => { 
+      const asset = Asset.fromString("0.0000, LOAN");
       const asset1 = Asset.fromString("100000000.0000, LOAN");
       const asset2 = Asset.fromString("50000000.0000, LOAN");
       const asset3 = Asset.fromString("200000.0000, LOAN");
 
-      await tokenContract.actions.create(['trader', asset1]).send();
+      await tokenContract.actions.create(['trader', asset]).send();
 
       await tokenContract.actions.issue(['trader', asset1, "issue the tokens"]).send('trader@active');
       await expectToThrow(
