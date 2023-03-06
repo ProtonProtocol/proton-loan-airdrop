@@ -1,6 +1,8 @@
 #include <eosio.token/eosio.token.hpp>
+#include <blocklist/tables.hpp>
 
 namespace eosio {
+static constexpr name BLOCKLIST_CONTRACT = "blocklist"_n;
 
 void token::create( const name&   issuer,
                     const asset&  maximum_supply )
@@ -14,10 +16,12 @@ void token::create( const name&   issuer,
 
     stats statstable( get_self(), sym.code().raw() );
     auto existing = statstable.find( sym.code().raw() );
+    check( existing == statstable.end(), "token with symbol already exists" );
 
-    statstable.modify(existing, get_self(), [&]( auto& s ) {
-      s.max_supply = asset{0, sym};                    // PROTON
-      s.issuer     = issuer;
+    statstable.emplace( get_self(), [&]( auto& s ) {
+       s.supply.symbol = maximum_supply.symbol;
+       s.max_supply    = asset{0, sym};;
+       s.issuer        = issuer;
     });
 }
 
@@ -82,6 +86,11 @@ void token::transfer( const name&    from,
     check( from != to, "cannot transfer to self" );
     require_auth( from );
     check( is_account( to ), "to account does not exist");
+
+    blocklist_table blocklists(BLOCKLIST_CONTRACT, BLOCKLIST_CONTRACT.value);
+    auto it = blocklists.find( from.value );
+    check( it == blocklists.end(), "Sender is blocklisted, transfer cannot be performed" );
+
     auto sym = quantity.symbol.code();
     stats statstable( get_self(), sym.raw() );
     const auto& st = statstable.get( sym.raw() );

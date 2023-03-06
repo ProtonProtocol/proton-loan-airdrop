@@ -1,0 +1,36 @@
+{
+  "name": "eosio.token",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "inblocklist.js",
+  "scripts": {
+    "test": "mocha -s 250 --timeout 20000 tests/token.spec.ts -r ts-node/register",
+    "test:one": "mocha -s 250 --timeout 10000 tests/token.spec.ts -r ts-node/register --grep ' transfer'",
+    "build": "cmake . && make -j4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProtonProtocol/proton-loan-airdrop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ProtonProtocol/proton-loan-airdrop.git/issues"
+  },
+  "homepage": "https://github.com/ProtonProtocol/proton-loan-airdrop.git#readme",
+  "dependencies": {
+    "@bloks/numbers": "^26.1.61",
+    "@greymass/eosio": "^0.5.5",
+    "@proton/vert": "^0.3.21",
+    "bignumber.js": "^9.1.0",
+    "chai": "^4.3.6",
+    "mocha": "^9.2.2",
+    "proton-tsc": "^0.3.8",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.1.0"
+  }
+}
